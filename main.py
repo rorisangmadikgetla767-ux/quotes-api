@@ -1,20 +1,33 @@
 from fastapi import FastAPI, HTTPException
+# I imported the fastapi.responses import JsonResponse because.. 
+# It lets me return custom JSON responses with specific codes
 from fastapi.responses import JSONResponse
 from database import get_connection
 from models import Quote
 
 app = FastAPI(title="Quotes API")
 
+# This below is the root endpoint.
 @app.get("/")
 def root():
     return {"message": "Quotes API is running!"}
 
+# This method registers a GET endpoint at /quotes
 @app.get("/quotes")
 def get_quotes():
     try:
+        # conn is my database connection object
+        # get_connection() calls my function from databse.py to conncet to the sql server
         conn = get_connection()
+
+        # cursor is an object used to execute SQL queries
         cursor = conn.cursor()
+
+        # cursor.execute runs a SQL query
+        # ("SELECT * FROM [dbo].[QUOTES]") = fetches all roqs from the Quotes table
         cursor.execute("SELECT * FROM [dbo].[QUOTES]")
+
+        # fetchall() means that the program is getting all the results from the Query
         rows = cursor.fetchall()
         columns = [col[0] for col in cursor.description]
         return [dict(zip(columns, row)) for row in rows]
