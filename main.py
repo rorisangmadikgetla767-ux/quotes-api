@@ -14,7 +14,7 @@ def get_quotes():
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM [dbo].[QUOTES]")
+        cursor.execute("SELECT * FROM quotes")
         rows = cursor.fetchall()
         columns = [col[0] for col in cursor.description]
         return [dict(zip(columns, row)) for row in rows]
@@ -26,7 +26,7 @@ def get_quote(id: int):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM [dbo].[QUOTES] WHERE Id = ?", id)
+        cursor.execute("SELECT * FROM quotes WHERE id = %s", (id,))
         row = cursor.fetchone()
         if not row:
             raise HTTPException(status_code=404, detail="Quote not found")
@@ -43,11 +43,8 @@ def create_quote(quote: Quote):
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
-            """INSERT INTO [dbo].[QUOTES] 
-            (Quote_id, Quote_number, Customer_Id, Vehicle_id, description_Q, created_by)
-            VALUES (?, ?, ?, ?, ?, ?)""",
-            quote.Quote_id, quote.Quote_number, quote.Customer_Id,
-            quote.Vehicle_id, quote.description_Q, quote.created_by
+            "INSERT INTO quotes (quote_id, quote_number, customer_id, vehicle_id, description_q, created_by) VALUES (%s, %s, %s, %s, %s, %s)",
+            (quote.Quote_id, quote.Quote_number, quote.Customer_Id, quote.Vehicle_id, quote.description_Q, quote.created_by)
         )
         conn.commit()
         return {"message": "Quote created successfully"}
@@ -60,10 +57,8 @@ def update_quote(id: int, quote: Quote):
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
-            """UPDATE [dbo].[QUOTES] SET
-            description_Q = ?, created_by = ?
-            WHERE Id = ?""",
-            quote.description_Q, quote.created_by, id
+            "UPDATE quotes SET description_q = %s, created_by = %s WHERE id = %s",
+            (quote.description_Q, quote.created_by, id)
         )
         conn.commit()
         return {"message": "Quote updated successfully"}
@@ -75,7 +70,7 @@ def delete_quote(id: int):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM [dbo].[QUOTES] WHERE Id = ?", id)
+        cursor.execute("DELETE FROM quotes WHERE id = %s", (id,))
         conn.commit()
         return {"message": "Quote deleted successfully"}
     except Exception as e:
