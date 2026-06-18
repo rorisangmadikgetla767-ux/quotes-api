@@ -117,7 +117,7 @@ def create_line_item(id: int, item: LineItem):
         total = int(item.quantity) * float(item.unit_price)
         cursor.execute(
             "INSERT INTO line_items(quote_id, description, quantity, unit_price, total) VALUES (%s, %s, %s, %s, %s)",
-            (id, item.description, item.quantity, item.unit_price, total)
+            (id, item.description, item.quantity, float(item.unit_price), float(total))
             
         ) 
         conn.commit()
