@@ -49,4 +49,5 @@ cursor.execute('''
         total DECIMAL(10,2)
     )
 ''')
+conn.commit()
 print('Line item table created')
