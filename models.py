@@ -14,7 +14,3 @@ class LineItem(BaseModel):
     quantity :int
     unit_price: float
     
-class LineItem(BaseModel):
-    description: str
-    quantity :int
-    unit_price: float
