@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from database import get_connection
-from models import Quote
+from models import Quote, LineItem
 
 app = FastAPI(title="Quotes API")
 
@@ -75,3 +75,56 @@ def delete_quote(id: int):
         return {"message": "Quote deleted successfully"}
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+    
+
+    
+# Steps in creating a line-item
+
+# 1st: Initialize the client instance
+
+# 2nd: Manage DB connection lifecycle
+
+# 3rd: Create Pydantic validation schemas
+
+# 4th: Implement route handlers
+
+# Prisma queries fully asynchronous
+
+# 5th Run the application : uvicorn main:app --reload
+
+# app.get("/") registers a GET request endpoint
+# ("/api/quotes/{id}/line-items")-> It is the URL path. {id}-> is a variable for the quote ID
+@app.get("/api/quotes/{id}/line-items")
+def get_line_items(id: int):
+    try:
+        # conn stores the database connection
+        # get_connection()-> calls my function from database.py to connect to Render
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM line_items WHERE quote_id = %s", (id,))
+        rows = cursor.fetchall()
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in rows]
+    except Exception as e:
+        return JSONResponse(status_code = 500, content={"error": str(e)})
+
+# POST - Add a line item to a quote 
+@app.post("/api/quotes/{id}/line-items", status_code=201)        
+def create_line_item(id: int, item: LineItem):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        total = int(item.quantity) * float(item.unit_price)
+        cursor.execute(
+            "INSERT INTO line_items(quote_id, description, quantity, unit_price, total) VALUES (%s, %s, %s, %s, %s)",
+            (id, item.description, item.quantity, item.unit_price, total)
+            
+        ) 
+        conn.commit()
+        return {"message":"Line item has been created"}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+      
+         
+
+

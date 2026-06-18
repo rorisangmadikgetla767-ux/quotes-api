@@ -33,6 +33,20 @@ cursor.execute('''
     'Q001', 'QN-001', 'CUST-01', 'BENZ001', None, None,
     'Q002', 'QN-002', 'CUST-02', 'BENZ002', 'Brake problems', 'Rorisang',
     'Q003', 'QN-003', 'CUST-04', 'BENZ003', 'Brake problems', 'Rorisang'
+    
 ))
 conn.commit()
 print('Data inserted!')
+
+# Creating line items table
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS line_items (
+        id SERIAL PRIMARY KEY,
+        quote_id INTEGER REFERENCES quotes(id),
+        description VARCHAR(255),
+        quantity INTEGER,
+        unit_price DECIMAL(10,2),
+        total DECIMAL(10,2)
+    )
+''')
+print('Line item table created')

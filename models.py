@@ -8,3 +8,13 @@ class Quote(BaseModel):
     Vehicle_id: str
     description_Q: Optional[str] = None
     created_by: Optional[str] = None
+    
+class LineItem(BaseModel):
+    description: str
+    quantity :int
+    unit_price: float
+    
+class LineItem(BaseModel):
+    description: str
+    quantity :int
+    unit_price: float
