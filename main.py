@@ -31,23 +31,6 @@ def root():
 @app.get("/quotes")
 def get_quotes():
     try:
-        @app.put("/quotes/{id}")
-        def update_code(id: int, quote: Quote):
-            try:
-                if not check_quote_lock(id):
-                    raise HTTPException(status_code=403, detail="Quote is locked and cannot be modified")
-                conn = get_connection()
-                cursor = conn.cursor()
-                cursor.execute(
-                    "UPDATE quotes SET description_q = %s, created_by = %s WHERE id = %s",
-                    (quote.description_Q, quote.created_by, id)
-                )
-                conn.commit()
-                return {"message": "Quote is updated successfully, Quote e nchafaditswe ka katleho"}
-            except HTTPException:
-                raise
-            except Exception as e:
-                return JSONResponse(status_code=500, content={"error": str(e)})
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM quotes")
@@ -90,6 +73,8 @@ def create_quote(quote: Quote):
 @app.put("/quotes/{id}")
 def update_quote(id: int, quote: Quote):
     try:
+        if not check_quote_lock(id):
+            raise HTTPException(status_code=403, detail="Quote is locked and cannot be modified ")
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -98,6 +83,19 @@ def update_quote(id: int, quote: Quote):
         )
         conn.commit()
         return {"message": "Quote updated successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE quotes SET description_q = %s, created_by = %s WHERE id = %s",
+            (quote.description_Q, quote.created_by, id)
+        )
+        conn.commit()
+        return {"message": "Quote updated successfully"}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
