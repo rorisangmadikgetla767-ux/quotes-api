@@ -51,3 +51,13 @@ cursor.execute('''
 ''')
 conn.commit()
 print('Line item table created')
+
+cursor.execute('''
+    ALTER TABLE quotes
+    ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'draft',
+    ADD COLUMN IF NOT EXISTS approved_by INTEGER,
+    ADD COLUMN IF NOT EXISTS approved_at TIMESTAMP,
+    ADD COLUMN IF NOT EXISTS rejection_reason TEXT           
+               ''')
+conn.commit()
+print('Status columns added!')
