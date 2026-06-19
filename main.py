@@ -4,6 +4,24 @@ from database import get_connection
 from models import Quote, LineItem
 from datetime import datetime
 
+def check_quote_lock(quote_id: int):
+    """
+    Checks if a quote is locked.
+    Returns False (locked) if status is 'approved'.
+    Returns True (editable) otherwise..
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT status FROM quotes WHERE id = %s", (quote_id))
+    row = cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Quote not found")
+    status = row[0]
+    if status == "approved":
+        return  False
+    return True
+    
+
 app = FastAPI(title="Quotes API")
 
 @app.get("/")
@@ -13,6 +31,23 @@ def root():
 @app.get("/quotes")
 def get_quotes():
     try:
+        @app.put("/quotes/{id}")
+        def update_code(id: int, quote: Quote):
+            try:
+                if not check_quote_lock(id):
+                    raise HTTPException(status_code=403, detail="Quote is locked and cannot be modified")
+                conn = get_connection()
+                cursor = conn.cursor()
+                cursor.execute(
+                    "UPDATE quotes SET description_q = %s, created_by = %s WHERE id = %s",
+                    (quote.description_Q, quote.created_by, id)
+                )
+                conn.commit()
+                return {"message": "Quote is updated successfully, Quote e nchafaditswe ka katleho"}
+            except HTTPException:
+                raise
+            except Exception as e:
+                return JSONResponse(status_code=500, content={"error": str(e)})
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM quotes")
@@ -69,6 +104,22 @@ def update_quote(id: int, quote: Quote):
 @app.delete("/quotes/{id}")
 def delete_quote(id: int):
     try:
+        @app.delete("/quotes/{id}")
+        def delete_code(id: int):
+            try:
+                if not check_quote_lock(id):
+                    raise HTTPException(status_code=403, detail="Quote is locked and cannto be modified. ")
+                conn = get_connection()
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM WHERE id = %s", (id))
+                conn.commit()
+                return{"message": "Quote is deleted successfully, Quote e hlakotswe ka katleho."}
+            except HTTPException:
+                raise 
+            except Exception:
+                raise
+            except Exception as e:
+                return JSONResponse(status_code=500, content={"error": str(e)})
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM quotes WHERE id = %s", (id,))
