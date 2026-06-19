@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from database import get_connection
 from models import Quote, LineItem
+from datetime import datetime
 
 app = FastAPI(title="Quotes API")
 
@@ -125,6 +126,102 @@ def create_line_item(id: int, item: LineItem):
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
       
-         
+@app.post("/api/quotes/{id}/approve")
+def approve_quote(id: int):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # 1. Check if the quote exists
+        cursor.execute("SELECT * FROM quotes WHERE id = %s", (id,))
+        row = cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Quote not found")
+        
+        columns = [col[0] for col in cursor.description]
+        quote = dict(zip(columns, row))
+        
+        # 2. Check for the current status 
+        if quote["status"] == "approved":
+            raise HTTPException(status_code=400, detail="Quote already approved")
+        if quote["status"] == "rejected":
+            raise HTTPException(status_code=400, detail="Rejected quotes must be resubmitted")
+        # 4. Update status, approved_by, approved_at
+        approved_by = 1
+        cursor.execute(
+            """
+            UPDATE quotes
+            SET status = 'approved', approved_by = %s, approved_at = %s
+            WHERE id = %s
+            """,
+            (approved_by, datetime.now(), id)
+        )
+        conn.commit()
+
+        # 5. Return the updated quote
+        cursor.execute("SELECT * FROM quotes WHERE id = %s", (id,))
+        row = cursor.fetchone()
+        columns = [col[0] for col in cursor.description]
+        return dict(zip(columns, row))
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+
+# REJECT a quote
+
+@app.post("/api/quotes/{id}/reject")
+def reject_quote(id: int, body: dict):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # 1. Check if the quote exists
+        cursor.execute("SELECT * FROM quotes WHERE id = %s", (id,))
+        row = cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Quote not found")
+
+        columns = [col[0] for col in cursor.description]
+        quote = dict(zip(columns, row))
+
+        # 2. Check current status
+        if quote["status"] == "approved":
+            raise HTTPException(status_code=400, detail="Quote already approved")
+        if quote["status"] == "rejected":
+            raise HTTPException(status_code=400, detail="rejected quotes must be resubmitted")
+        
+        
+        # 3 Get rejection_reason from 
+        rejection_reason = body.get("rejection_reason")
+        if not rejection_reason:
+            raise HTTPException(status_code=400, detail="Rejection reason required")
+        
+        #4. Update status and rejection_reason
+        cursor.execute("""
+                       
+            UPDATE quotes 
+            SET status = 'rejected', rejection_reason = %s
+            WHERE id = %s 
+            
+            """,
+            (rejection_reason, id)
+        )
+        conn.commit()
+        
+        #5 Return the updated quote
+        cursor.execute("SELECT * FROM quotes WHERE id = %s", (id,))
+        row = cursor.fetchone()
+        columns = [col[0] for col in cursor.description]
+        return dict(zip(columns, row))
+    except HTTPException:
+        raise
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+        
+           
 
 
