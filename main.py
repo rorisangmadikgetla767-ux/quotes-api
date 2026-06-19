@@ -10,6 +10,7 @@ def check_quote_lock(quote_id: int):
     Returns False (locked) if status is 'approved'.
     Returns True (editable) otherwise..
     """
+    # conn = get_connection() -> This simply creates a database connection, without this, python cannot talk to the database
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT status FROM quotes WHERE id = %s", (quote_id))
