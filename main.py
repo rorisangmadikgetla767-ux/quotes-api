@@ -13,7 +13,7 @@ def check_quote_lock(quote_id: int):
     # conn = get_connection() -> This simply creates a database connection, without this, python cannot talk to the database
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT status FROM quotes WHERE id = %s", (quote_id))
+    cursor.execute("SELECT status FROM quotes WHERE id = %s", (quote_id,))
     row = cursor.fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="Quote not found")
