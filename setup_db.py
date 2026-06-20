@@ -77,6 +77,14 @@ conn.commit()
 print('The Customers table has been created successfully!')
 
 cursor.execute('''
+    SELECT column_name FROM information_schema.columns
+    WHERE table_name = 'customers'
+''')
+for row in cursor.fetchall():
+    print(row)
+
+
+cursor.execute('''
     ALTER TABLE quotes
     ADD COLUMN IF NOT EXISTS sent_to_customer_at TIMESTAMP,
     ADD COLUMN IF NOT EXISTS customer_approved_at TIMESTAMP
