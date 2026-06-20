@@ -95,7 +95,7 @@ for row in cursor.fetchall():
 cursor.execute('''
     SELECT q.id, q.quote_id, c.name, c.email, c.can_email
     FROM quotes q
-    LEFT JOIN customer c ON q.customer_id = c.customer_id
+    LEFT JOIN customers c ON q.customer_id = c.customer_id
 ''')
 for row in cursor.fetchall():
     print(row)
