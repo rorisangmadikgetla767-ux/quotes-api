@@ -75,6 +75,13 @@ cursor.execute('''
             ''')
 conn.commit()
 print('The Customers table has been created successfully!')
+cursor.execute('''
+    ALTER TABLE customers
+    ADD COLUMN IF NOT EXISTS can_email BOOLEAN DEFAULT TRUE
+''')
+conn.commit()
+print("can_email column added.")
+
 
 cursor.execute('''
     SELECT column_name FROM information_schema.columns
