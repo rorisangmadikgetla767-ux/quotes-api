@@ -69,6 +69,7 @@ cursor.execute('''
                   name  VARCHAR(100),
                   email VARCHAR(255),
                   phone VARCHAR(20)
+                  can_email BOOLEAN DEFAULT TRUE
                   
                   )
             ''')
@@ -76,6 +77,7 @@ conn.commit()
 print('The Customers table has been created successfully!')
 
 cursor.execute('''
+    ALTER TABLE quotes
     ADD COLUMN IF NOT EXISTS sent_to_customer_at TIMESTAMP,
     ADD COLUMN IF NOT EXISTS customer_approved_at TIMESTAMP
 ''')
