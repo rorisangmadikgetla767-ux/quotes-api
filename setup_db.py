@@ -68,7 +68,7 @@ cursor.execute('''
                   Customer_Id VARCHAR(50) UNIQUE NOT NULL,
                   name  VARCHAR(100),
                   email VARCHAR(255),
-                  phone VARCHAR(20)
+                  phone VARCHAR(20),
                   can_email BOOLEAN DEFAULT TRUE
                   
                   )
