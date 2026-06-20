@@ -68,10 +68,17 @@ curso.execute('''
                   Customer_Id VARCHAR(50) UNIQUE NOT NULL,
                   name  VARCHAR(100),
                   email VARCHAR(255),
-                  phone VARCHAR(20),
-                  sent_to_customer_at TIMESTAMP,
-                  customer_approved_at TIMESTAMP
+                  phone VARCHAR(20)
+                  
                   )
             ''')
 conn.commit()
 print('The Customers table has been created successfully!')
+
+cursor.execute('''
+    ADD COLUMN IF NOT EXISTS sent_to_customer_at TIMESTAMP,
+    ADD COLUMN IF NOT EXISTS customer_approved_at TIMESTAMP
+''')
+conn.commit()
+print("Quote Tracking columns have been added.")
+
