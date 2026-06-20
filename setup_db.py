@@ -62,7 +62,7 @@ cursor.execute('''
 conn.commit()
 print('Status columns added!')
 
-curso.execute('''
+cursor.execute('''
               CREATE TABLE IF NOT EXISTS customers(
                   Id SERIAL  PRIMARY KEY,
                   Customer_Id VARCHAR(50) UNIQUE NOT NULL,
