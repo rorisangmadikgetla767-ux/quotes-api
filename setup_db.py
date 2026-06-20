@@ -82,3 +82,10 @@ cursor.execute('''
 conn.commit()
 print("Quote Tracking columns have been added.")
 
+
+cursor.execute('''
+    SELECT column_name FROM information_schema.columns
+    WHERE table_name = 'quotes' 
+''')
+for row in cursor.fetchall():
+    print(row)
