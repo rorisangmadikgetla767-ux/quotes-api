@@ -61,3 +61,15 @@ cursor.execute('''
                ''')
 conn.commit()
 print('Status columns added!')
+
+curso.execute('''
+              CREATE TABLE IF NOT EXISTS customers(
+                  Id SERIAL  PRIMARY KEY,
+                  Customer_Id VARCHAR(50) UNIQUE NOT NULL,
+                  name  VARCHAR(100),
+                  email VARCHAR(255),
+                  phone VARCHAR(20)
+                  )
+            ''')
+conn.commit()
+print('The Customers table has been created successfully!')
