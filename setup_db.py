@@ -68,7 +68,9 @@ curso.execute('''
                   Customer_Id VARCHAR(50) UNIQUE NOT NULL,
                   name  VARCHAR(100),
                   email VARCHAR(255),
-                  phone VARCHAR(20)
+                  phone VARCHAR(20),
+                  sent_to_customer_at TIMESTAMP,
+                  customer_approved_at TIMESTAMP
                   )
             ''')
 conn.commit()
