@@ -22,12 +22,18 @@ cursor.execute('''
 conn.commit()
 print('Table created!')
 
-cursor.execute('''
+try:
+    cursor.execute('''
     ALTER TABLE quotes
     ADD CONSTRAINT quotes_quote_id_unique UNIQUE (Quote_id)
-''')
-conn.commit()
-print("Quote_id uniqueness constraint added.")
+    ''')
+    conn.commit()
+    print("Quote_id uniqueness constraint added.")
+except psycopg2.errors.DuplicateTable:
+    conn.rollback()
+    print("Quote_id uniqueness constraint already exists, skipping..")
+
+
 
 
 
