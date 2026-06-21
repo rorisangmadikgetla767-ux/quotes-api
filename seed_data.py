@@ -10,7 +10,8 @@ cursor.execute('''
     ON CONFLICT (Customer_id) DO NOTHING
     ''', (
         'CUST-01', 'Rorisang Madikgetla', 'rorisangmadikgetla767@gmail.com', '0721426286', True,
-        'CUST-08', 'John Smith', 'madixxwtf@gmail.com', '0662303453', True
+        'CUST-08', 'John Smith', 'madixxwtf@gmail.com', '0662303453', True,
+        'CUST-02', 'Naledi Sello', 'katlehomadikgetla65@gmail.com', '0736736373', True
         
 ))
 conn.commit()
