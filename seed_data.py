@@ -14,3 +14,8 @@ cursor.execute('''
         
 ))
 conn.commit()
+print('Customers seeded (or already existed).')
+
+cursor.execute('''
+    INSERT INTO QUOTES (Quote_id, Quote_number, Customer_Id, Vehicle_id, description_Q, created_by)''')
+    VALUES
