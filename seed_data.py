@@ -19,9 +19,9 @@ print('Customers seeded (or already existed).')
 cursor.execute('''
     INSERT INTO QUOTES (Quote_id, Quote_number, Customer_Id, Vehicle_id, description_Q, created_by)
     VALUES
-    (%s, %s, %s, %s, %s)
-    (%s, %s, %s, %s, %s)
-    (%s, %s, %s, %s, %s)
+    (%s, %s, %s, %s, %s, %s),
+    (%s, %s, %s, %s, %s, %s),
+    (%s, %s, %s, %s, %s, %s)
     
 ''', (
     'Q001', 'QN-001', 'CUST-01', 'BENZ001', None, None,
@@ -32,5 +32,5 @@ conn.commit()
 print('Quote has been seeded successfully..')
 
 cursor.close()
-conn.close
+conn.close()
     
