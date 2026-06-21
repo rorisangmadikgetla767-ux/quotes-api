@@ -6,7 +6,7 @@ cursor.execute('''
     INSERT INTO customers (Customer_Id, name, email, phone, can_email)
     VALUES
     (%s, %s, %s, %s, %s),
-    (%s, %s, %s, %s, %s),
+    (%s, %s, %s, %s, %s)
     ON CONFLICT (Customer_id) DO NOTHING
     ''', (
         'CUST-01', 'Rorisang Madikgetla', 'rorisangmadikgetla767@gmail.com', '0721426286', True,
