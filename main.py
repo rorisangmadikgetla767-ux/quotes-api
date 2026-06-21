@@ -304,7 +304,7 @@ def send_quotes(id: int):
         
         # 3 Do not send if the customer has opted out
         if not can_email:
-            raise HTTPException(status_code=200, detail="Customer has opted out of email..")
+            raise HTTPException(status_code=400, detail="Customer has opted out of email..")
         
         # 4 If hahona email etswang ho customer
         if not customer_email:
@@ -335,9 +335,9 @@ def send_quotes(id: int):
         row = cursor.fetchone()
         columns = [col[0] for col in cursor.description]
         updated_quote = dict(zip(columns, row))
-        updated_quote["sent"] = updated_quote["sent_to_customers_at"] is not None
+        updated_quote["sent"] = updated_quote["sent_to_customer_at"] is not None
         
-        return update_quote
+        return updated_quote
     except HTTPException:
         raise
     except Exception as e:
