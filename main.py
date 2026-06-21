@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from database import get_connection
 from models import Quote, LineItem
 from datetime import datetime
+from email_utils import send_emails
 
 def check_quote_lock(quote_id: int):
     """
@@ -300,4 +301,45 @@ def send_quotes(id: int):
             raise HTTPException(status_code=404, detail="No customer records found, please contact Blaze Diagnostic for more information, hahona se re se bonang hotswa hlakoreng la rona , letsetsa laze Diagnsostic for tsebo engwe")
         
         customer_name, customer_email, can_email = customer_row
+        
+        # 3 Do not send if the customer has opted out
+        if not can_email:
+            raise HTTPException(status_code=200, detail="Customer has opted out of email..")
+        
+        # 4 If hahona email etswang ho customer
+        if not customer_email:
+            raise HTTPException(status_code=400, detail="No email on file for this customer")
+        
+        # 5 Building the Email content
+        subject = f"Your Quote {quote['quote_number']} from Blaze Diagnostics"
+        body = (
+            f"Hi {customer_name},\n\n"
+            f"Please find your quote details below.\n\n"
+            f"Quote Number: {quote['quote_number']}\n"
+            f"Please let us know if you would like to proceed.\n\n"
+            f"Regards, \nBlaze Diagnostics"
+        )
+        
+        # 6 send email not real for now
+        send_email(to=customer_email, subject=subject, body=body)
+        
+        #7 Record that the quote has been sent
+        cursor.execute(
+            "UPDATE quotes SET sent_to_customer_at = %s WHERE id= %s",
+            (datetime.now(), id)   
+        )
+        conn.commit()
+        
+        # 8 return the updated quote , with an explicit 'sent' flag
+        cursor.execute("SELECT * FROM quotes WHERE id = %s", (id,))
+        row = cursor.fetchone()
+        columns = [col[0] for col in cursor.description]
+        updated_quote = dict(zip(columns, row))
+        update_quote["sent"] = update_quote["sent_to_customers_at"] is not None
+        
+        return update_quote
+    except HTTPException:
+        raise
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
         
