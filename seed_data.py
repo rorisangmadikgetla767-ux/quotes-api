@@ -25,7 +25,7 @@ cursor.execute('''
     
 ''', (
     'Q001', 'QN-001', 'CUST-01', 'BENZ001', None, None,
-    'Q002', 'QN-002', 'CUST-02', 'BENZ002', 'Brake problems', 
+    'Q002', 'QN-002', 'CUST-02', 'BENZ002', 'Brake problems', 'Rorisang',
     'Q003', 'QN-003', 'CUST-04', 'BENZ003', 'Brake problems', 'Rorisang'
 ))
 conn.commit()
