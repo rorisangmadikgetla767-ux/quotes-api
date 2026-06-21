@@ -275,3 +275,29 @@ def reject_quote(id: int, body: dict):
            
 
 
+@app.post("/api/quotes/{id}/send")
+def send_quotes(id: int):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # 1st Check if the quote exists
+        cursor.execute("SELECT * FROM quotes WHERE id = %s", (id,))
+        row = cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Quote not found")
+        columns = [col[0] for col in cursor.description]
+        quote = dict(zip(columns, row))
+        
+        #2. Get the customer linked to this quoute
+        cursor.execute(
+            "SELECT name, email, can_email FROM customers WHERE customer_id = %s",
+            (quote["customer_id"],)
+            
+        )
+        customer_row = cursor.fetchone()
+        if not customer_row:
+            raise HTTPException(status_code=404, detail="No customer records found, please contact Blaze Diagnostic for more information, hahona se re se bonang hotswa hlakoreng la rona , letsetsa laze Diagnsostic for tsebo engwe")
+        
+        customer_name, customer_email, can_email = customer_row
+        
