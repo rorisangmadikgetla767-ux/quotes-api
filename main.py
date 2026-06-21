@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from database import get_connection
 from models import Quote, LineItem
 from datetime import datetime
-from email_utils import send_emails
+from email_utils import send_email
 
 def check_quote_lock(quote_id: int):
     """
@@ -335,7 +335,7 @@ def send_quotes(id: int):
         row = cursor.fetchone()
         columns = [col[0] for col in cursor.description]
         updated_quote = dict(zip(columns, row))
-        update_quote["sent"] = update_quote["sent_to_customers_at"] is not None
+        updated_quote["sent"] = updated_quote["sent_to_customers_at"] is not None
         
         return update_quote
     except HTTPException:
