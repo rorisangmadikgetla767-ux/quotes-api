@@ -22,6 +22,13 @@ cursor.execute('''
 conn.commit()
 print('Table created!')
 
+cursor.execute('''
+    ALTER TABLE quotes
+    ADD CONSTRAINT quotes_quote_id_unique UNIQUE (Quote_id)
+''')
+conn.commit()
+print("Quote_id uniqueness constraint added.")
+
 
 
 # Creating line items table
