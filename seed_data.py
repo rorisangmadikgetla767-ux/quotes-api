@@ -29,7 +29,7 @@ cursor.execute('''
     'Q003', 'QN-003', 'CUST-04', 'BENZ003', 'Brake problems', 'Rorisang'
 ))
 conn.commit()
-print('Quote has been seeded successfully..')
+print('Quote has been seeded successfully..')Q
 
 cursor.close()
 conn.close()
