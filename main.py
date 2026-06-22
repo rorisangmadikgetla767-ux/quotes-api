@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from database import get_connection
-from models import Quote, LineItem
+from models import Quote, QuoteCreate, LineItem
 from datetime import datetime
 from email_utils import send_email
 from fastapi.middleware.cors import CORSMiddleware
@@ -69,10 +69,16 @@ def get_quote(id: int):
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.post("/quotes", status_code=201)
-def create_quote(quote: Quote):
+def create_quote(quote: QuoteCreate):
     try:
         conn = get_connection()
         cursor = conn.cursor()
+        
+        if not quote.Quote_id:
+            cursor.execute("SELECT COUNT(*) FROM quotes")
+            n = cursor.fetchnone()[0] + 1
+            quote.Quote_id= f"Q{n:03d}"
+            quote.Quote_number = f"QN-{n:03d}"
         cursor.execute(
             "INSERT INTO quotes (quote_id, quote_number, customer_id, vehicle_id, description_q, created_by) VALUES (%s, %s, %s, %s, %s, %s)",
             (quote.Quote_id, quote.Quote_number, quote.Customer_Id, quote.Vehicle_id, quote.description_Q, quote.created_by)

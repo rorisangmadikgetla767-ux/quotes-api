@@ -20,6 +20,8 @@ class LineItem(BaseModel):
 # Optional[str] = None -> means the field can be left out of the JSON, or explicitly set to null
 
 class QuoteCreate(Quote):
+    Quote_id: Optional[str] = None
+    Quote_number: Optional[str] = None
     expiry_date: Optional[date] = None
     notes: Optional[str] = None
     discount_value: Optional[float] = 0
