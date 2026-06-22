@@ -80,10 +80,17 @@ def create_quote(quote: QuoteCreate):
             quote.Quote_id= f"Q{n:03d}"
             quote.Quote_number = f"QN-{n:03d}"
         cursor.execute(
-            "INSERT INTO quotes (quote_id, quote_number, customer_id, vehicle_id, description_q, created_by) VALUES (%s, %s, %s, %s, %s, %s)",
-            (quote.Quote_id, quote.Quote_number, quote.Customer_Id, quote.Vehicle_id, quote.description_Q, quote.created_by)
-        )
-        conn.commit()
+            "INSERT INTO quotes (quote_id, quote_number, customer_id, vehicle_id, description_q, created_by) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+            (quote.Quote_id, quote.Quote_number, quote.Customer_Id, quote.Vehicle_id, quote.description_Q, quote.created_by))
+        new_id = cursor.fetchnone()[0]    
+        for item in quote.line_items:
+            total = int(item.quantity) * float(item.unit_price)
+            cursor.execute(
+                "INSERT INTO line_items(quote_id, description, quantity, unit_price, total) VALUES (%s, %s, %s, %s, %s)",
+                (new_id, item.description, item.quantity, float(item.unit_price), float(total))
+            )
+            conn.commit()
+        
         return {"message": "Quote created successfully"}
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
