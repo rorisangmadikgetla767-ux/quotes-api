@@ -4,6 +4,7 @@ from database import get_connection
 from models import Quote, LineItem
 from datetime import datetime
 from email_utils import send_email
+from fastapi.middleware.cors import CORSMiddleware
 
 def check_quote_lock(quote_id: int):
     """
@@ -25,6 +26,15 @@ def check_quote_lock(quote_id: int):
     
 
 app = FastAPI(title="Quotes API")
+
+# I added a CORS block for allowing Neil[Frontend] to access the data in the API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Allow all origins (I will change this after production)
+    allow_credentials=True, # Allow cookies/auth headers
+    allow_methods=["*"], # Allow all methods 
+    allow_headers=["*"], # Allow all headers
+)
 
 @app.get("/")
 def root():
@@ -342,4 +352,42 @@ def send_quotes(id: int):
         raise
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+@app.post("/api/quotes{id}/resubmit")
+def resbmit_quote(id: int):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
         
+        # 1. Check if quote exists
+        cursor.execute("SELECT * FROM quotes WHERE id = %s", (id,))
+        row = cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Quote not found")
+        
+        columns = [col[0] for col in cursor.description]
+        quote = dict(zip(columns, row))
+        
+        # 2ND Step, check if the quote is rejected 
+        if quote.get("status") != "rejected":
+            raise HTTPException(status_code=400, detail="Only rejected quotes can be submitted")
+        
+        # 3RD Step, Updtate status back to pending and clear rejection reason
+        cursor.execute(
+            """
+            UPDATE quotes
+            SET status = 'pending', rejection_reason = NULL
+            WHERE id = %s
+            """,
+            (id,)
+        )
+        conn.commit()
+        
+        # 4 . Return the updated Quote
+        cursor.execute("SELECT * FROM quotes WHERE id = %s",(id,))
+        row = cursor.fetchnone()
+        columns = [col[0] for col in cursor.description]
+        return dict(zip(columns, row))
+    except HTTPException:
+        raise
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error":str(e)})
