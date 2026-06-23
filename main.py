@@ -365,7 +365,7 @@ def send_quotes(id: int):
         raise
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
-@app.post("/api/quotes{id}/resubmit")
+@app.post("/api/quotes/{id}/resubmit")
 def resbmit_quote(id: int):
     try:
         conn = get_connection()
