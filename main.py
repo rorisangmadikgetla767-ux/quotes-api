@@ -76,7 +76,8 @@ def create_quote(quote: QuoteCreate):
         
         if not quote.Quote_id:
             cursor.execute("SELECT COUNT(*) FROM quotes")
-            n = cursor.fetchnone()[0] + 1
+            n = cursor.fetchone()[0] + 1
+            new_id = cursor.fetchone()[0]
             quote.Quote_id= f"Q{n:03d}"
             quote.Quote_number = f"QN-{n:03d}"
         cursor.execute(
@@ -89,7 +90,7 @@ def create_quote(quote: QuoteCreate):
                 "INSERT INTO line_items(quote_id, description, quantity, unit_price, total) VALUES (%s, %s, %s, %s, %s)",
                 (new_id, item.description, item.quantity, float(item.unit_price), float(total))
             )
-            conn.commit()
+        conn.commit()
         
         return {"message": "Quote created successfully"}
     except Exception as e:
