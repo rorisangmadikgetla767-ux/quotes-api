@@ -3,10 +3,10 @@ from typing import Optional,List
 from datetime import date
 
 class Quote(BaseModel):
-    Quote_id: str
-    Quote_number: str
-    Customer_Id: str
-    Vehicle_id: str
+    quote_id: str
+    quote_number: str
+    customer_Id: str
+    vehicle_id: str
     description_Q: Optional[str] = None
     created_by: Optional[str] = None
     
@@ -20,8 +20,6 @@ class LineItem(BaseModel):
 # Optional[str] = None -> means the field can be left out of the JSON, or explicitly set to null
 
 class QuoteCreate(Quote):
-    Quote_id: Optional[str] = None
-    Quote_number: Optional[str] = None
     expiry_date: Optional[date] = None
     notes: Optional[str] = None
     discount_value: Optional[float] = 0
