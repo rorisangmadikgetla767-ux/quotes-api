@@ -82,7 +82,7 @@ def create_quote(quote: QuoteCreate):
             quote.Quote_number = f"QN-{n:03d}"
         cursor.execute(
             "INSERT INTO quotes (quote_id, quote_number, customer_id, vehicle_id, description_q, created_by) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
-            (quote.Quote_id, quote.Quote_number, quote.Customer_Id, quote.Vehicle_id, quote.description_Q, quote.created_by))
+            (quote.quote_id, quote.quote_number, quote.customer_id, quote.vehicle_id, quote.description_q, quote.created_by))
         new_id = cursor.fetchnone()[0]    
         for item in quote.line_items:
             total = int(item.quantity) * float(item.unit_price)
